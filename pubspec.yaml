@@ -34,6 +34,8 @@ dependencies:
   mobile_scanner: ^3.5.7
   nfc_manager: ^3.3.0
   modal_bottom_sheet: ^3.0.0
+  supabase_flutter: ^2.5.0
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -58,9 +60,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
+  # Copy .env.example to .env and add your Supabase URL/Key. Do not commit .env.
   # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  #   - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

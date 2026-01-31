@@ -154,20 +154,24 @@ class _ActionButton extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: isPrimary ? AppTheme.background : AppTheme.textPrimary,
-                letterSpacing: -0.3,
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: isPrimary ? AppTheme.background : AppTheme.textPrimary,
+                  letterSpacing: -0.3,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Icon(
               icon,
-              size: 22,
+              size: 20,
               color: isPrimary ? AppTheme.background : AppTheme.textPrimary,
             ),
           ],
