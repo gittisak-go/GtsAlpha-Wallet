@@ -1,38 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Premium Dark theme – Apple Wallet–like (โทนมืดหรูหรา)
+/// UI Theme based on the provided reference image (Mint Green & Dark Gray)
 class AppTheme {
   AppTheme._();
 
-  // Core colors - ดำสนิทหรูหรา
-  static const Color background = Color(0xFF000000);
-  static const Color surface = Color(0xFF1C1C1E);
-  static const Color surfaceElevated = Color(0xFF2C2C2E);
-  static const Color surfaceCard = Color(0xFF1A1A1C);
+  // Core colors from the reference image
+  static const Color background = Color(0xFF1A1C1E);
+  static const Color surface = Color(0xFF2D3135);
+  static const Color primaryMint = Color(0xFF34A87F);
+  static const Color textPrimary = Colors.white;
+  static const Color textSecondary = Color(0xFF9BA1A6);
   
-  // Accent - น้ำเงิน iOS สดใส
-  static const Color primaryBlue = Color(0xFF0A84FF);
-  static const Color primaryBlueLight = Color(0xFF5AC8FA);
-  static const Color primaryBlueDark = Color(0xFF0066CC);
-  
-  // Text
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFF8E8E93);
-  static const Color textTertiary = Color(0xFF636366);
-
-  // Gradients
-  static const LinearGradient primaryGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [primaryBlue, primaryBlueDark],
-  );
-
-  static const LinearGradient surfaceGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFF1C1C1E), Color(0xFF0D0D0D)],
-  );
+  // Grid Item Colors (Estimated from image)
+  static const Color gridBlue = Color(0xFF2D364D);
+  static const Color gridGreen = Color(0xFF1E3D2F);
+  static const Color gridBrown = Color(0xFF3D382E);
+  static const Color gridRed = Color(0xFF4D2D31);
+  static const Color gridOrange = Color(0xFF4D382D);
+  static const Color gridTeal = Color(0xFF1E3D3D);
 
   static ThemeData get darkTheme {
     return ThemeData(
@@ -40,12 +26,10 @@ class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: background,
       colorScheme: const ColorScheme.dark(
-        primary: primaryBlue,
-        secondary: primaryBlueLight,
+        primary: primaryMint,
         surface: surface,
-        onPrimary: textPrimary,
         onSurface: textPrimary,
-        onSurfaceVariant: textSecondary,
+        secondary: primaryMint,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -53,73 +37,29 @@ class AppTheme {
         foregroundColor: textPrimary,
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: surface,
-        modalBackgroundColor: surface,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryBlue,
-          foregroundColor: textPrimary,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.4,
-          ),
-        ),
-      ),
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
-          fontSize: 34,
-          fontWeight: FontWeight.w700,
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
           color: textPrimary,
-          letterSpacing: -0.5,
         ),
         headlineMedium: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.w700,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
           color: textPrimary,
-          letterSpacing: -0.5,
         ),
         titleLarge: TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-          color: textPrimary,
-          letterSpacing: -0.3,
-        ),
-        titleMedium: TextStyle(
-          fontSize: 17,
+          fontSize: 20,
           fontWeight: FontWeight.w600,
           color: textPrimary,
-          letterSpacing: -0.2,
         ),
         bodyLarge: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w400,
+          fontSize: 16,
           color: textPrimary,
-          letterSpacing: -0.2,
         ),
         bodyMedium: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w400,
+          fontSize: 14,
           color: textSecondary,
-          letterSpacing: -0.2,
-          height: 1.4,
-        ),
-        labelLarge: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-          letterSpacing: -0.2,
         ),
       ),
     );

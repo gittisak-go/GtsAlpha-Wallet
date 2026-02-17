@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../theme/app_theme.dart';
-import '../services/firebase_service.dart';
+import '../services/supabase_service.dart';
 import '../services/nfc_service.dart';
 import 'qr_scanner.dart';
 import 'nfc_scanner.dart';
@@ -63,7 +63,7 @@ class _ScanBottomSheetState extends State<ScanBottomSheet>
       onRead: (value) async {
         if (!mounted) return;
         try {
-          await FirebaseService.saveScan(type: 'NFC', value: value);
+          await SupabaseService.saveScanLog(type: 'NFC', value: value);
           widget.onScanSuccess?.call('NFC', value);
           if (mounted) Navigator.of(context).pop();
         } catch (_) {}
@@ -76,7 +76,7 @@ class _ScanBottomSheetState extends State<ScanBottomSheet>
 
   void _onQrDetect(String value) async {
     try {
-      await FirebaseService.saveScan(type: 'QR', value: value);
+      await SupabaseService.saveScanLog(type: 'QR', value: value);
       widget.onScanSuccess?.call('QR', value);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {}
@@ -96,11 +96,11 @@ class _ScanBottomSheetState extends State<ScanBottomSheet>
       opacity: _fadeAnimation,
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.75,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         decoration: const BoxDecoration(
-          color: Color(0xFF1C1C1E),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          color: AppTheme.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: SafeArea(
           top: false,
@@ -118,50 +118,30 @@ class _ScanBottomSheetState extends State<ScanBottomSheet>
                       width: 40,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Header with close button - เพิ่ม padding ด้านขวา
+                  // Header
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'พร้อมที่',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.textPrimary,
-                                letterSpacing: -0.5,
-                                height: 1.1,
-                              ),
-                            ),
-                            const Text(
-                              'จะสแกน',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.textPrimary,
-                                letterSpacing: -0.5,
-                                height: 1.1,
-                              ),
-                            ),
-                          ],
+                      const Text(
+                        'พร้อมสแกน',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
-                      const SizedBox(width: 16),
                       GestureDetector(
                         onTap: _close,
                         child: Container(
-                          width: 36,
-                          height: 36,
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withOpacity(0.05),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -174,101 +154,72 @@ class _ScanBottomSheetState extends State<ScanBottomSheet>
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // Instruction text
                   Text(
                     _isQrMode
-                        ? 'ชี้กล้องไปที่ QR Code เพื่อสแกน'
-                        : 'Tap the card or ring as shown above\nand hold until the end of the operation.',
+                        ? 'วางรหัส QR ให้อยู่ในกรอบเพื่อเริ่มการสแกน'
+                        : 'แตะการ์ดหรือแท็ก NFC ที่ด้านหลังโทรศัพท์ของคุณ',
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       color: AppTheme.textSecondary,
-                      height: 1.5,
-                      letterSpacing: -0.2,
+                      height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  // Scanner area with card-like container
+                  const SizedBox(height: 32),
+                  // Scanner Area
+                  QrScannerWidget(
+                    onDetect: _onQrDetect,
+                  ),
+                  const SizedBox(height: 32),
+                  // Mode Toggle
                   Container(
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: AppTheme.primaryBlue.withOpacity(0.2),
-                        width: 1,
-                      ),
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    padding: const EdgeInsets.all(16),
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      transitionBuilder: (child, animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                      child: _isQrMode
-                          ? QrScannerWidget(
-                              key: const ValueKey('qr'),
-                              onDetect: _onQrDetect,
-                            )
-                          : NfcScannerWidget(
-                              key: const ValueKey('nfc'),
-                            ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _ModeButton(
+                            label: 'QR Code',
+                            isSelected: _isQrMode,
+                            onTap: () => setState(() => _isQrMode = true),
+                          ),
+                        ),
+                        Expanded(
+                          child: _ModeButton(
+                            label: 'NFC Tag',
+                            isSelected: !_isQrMode,
+                            onTap: () => setState(() => _isQrMode = false),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Mode toggle
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _ModeButton(
-                          label: 'QR',
-                          isSelected: _isQrMode,
-                          onTap: () {
-                            if (_nfcSessionStarted) {
-                              NfcService.stopSession();
-                              _nfcSessionStarted = false;
-                            }
-                            setState(() => _isQrMode = true);
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _ModeButton(
-                          label: 'NFC',
-                          isSelected: !_isQrMode,
-                          onTap: () => setState(() => _isQrMode = false),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  // Cancel button
+                  // Cancel Button
                   SizedBox(
-                    width: double.infinity,
-                    height: 52,
+                    height: 56,
                     child: ElevatedButton(
                       onPressed: _close,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryBlue,
-                        foregroundColor: AppTheme.textPrimary,
+                        backgroundColor: AppTheme.primaryMint,
+                        foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: const Text(
                         'ยกเลิก',
                         style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.3,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -294,21 +245,19 @@ class _ModeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        height: 44,
+      child: Container(
+        height: 48,
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.textPrimary : Colors.white.withOpacity(0.1),
+          color: isSelected ? AppTheme.primaryMint : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         alignment: Alignment.center,
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: isSelected ? AppTheme.background : AppTheme.textSecondary,
+            fontSize: 16,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.white : AppTheme.textSecondary,
           ),
         ),
       ),
@@ -316,7 +265,6 @@ class _ModeButton extends StatelessWidget {
   }
 }
 
-/// เปิด Bottom Sheet แบบ Smooth
 void showScanBottomSheet(
   BuildContext context, {
   ScanMode initialMode = ScanMode.qr,
