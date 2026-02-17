@@ -148,7 +148,7 @@ flutter build ios --release
 
 | Role | Email |
 |------|-------|
-| System Administrator | patty_patteera19@hotmail.com |
+
 | Developer | gittisakwannakeeree@gmail.com |
 | Developer | phongwut.w@gmail.com |
 | Director | director@gtsalphamcp.com |
